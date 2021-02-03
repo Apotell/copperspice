@@ -13,7 +13,7 @@ if(BUILD_PLATFORMS_XCB_PLUGIN AND XCB_GLX_LIB)
 
    set_target_properties(CsGuiXcb_Glx PROPERTIES
       OUTPUT_NAME CsGuiXcb_Glx${BUILD_ABI} PREFIX ""
-      INSTALL_RPATH "$ORIGIN/.."
+      INSTALL_RPATH "$ORIGIN"
    )
 
    target_sources(CsGuiXcb_Glx
@@ -51,5 +51,5 @@ if(BUILD_PLATFORMS_XCB_PLUGIN AND XCB_GLX_LIB)
       -DXCB_USE_XINPUT2
    )
 
-   install(TARGETS CsGuiXcb_Glx DESTINATION ${CMAKE_INSTALL_LIBDIR})
+   install(TARGETS CsGuiXcb_Glx DESTINATION ${CMAKE_INSTALL_BINDIR}/platforms)
 endif()
