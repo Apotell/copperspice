@@ -32,6 +32,11 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
       -DQT_PLUGIN
    )
 
-   install(TARGETS CsPrinterDriverWin DESTINATION ${CMAKE_INSTALL_LIBDIR})
+   install(TARGETS CsPrinterDriverWin DESTINATION ${CMAKE_INSTALL_BINDIR}/platforms)
+
+   if (WIN32)
+     install(FILES $<TARGET_PDB_FILE:CsPrinterDriverWin> DESTINATION ${CMAKE_INSTALL_BINDIR}/platforms)
+   endif()
+
 endif()
 

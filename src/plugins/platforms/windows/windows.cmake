@@ -118,6 +118,11 @@ if(BUILD_PLATFORMS_WINDOWS_PLUGIN)
 
    function_generate_resources(CsGuiWin)
 
-   install(TARGETS CsGuiWin DESTINATION ${CMAKE_INSTALL_LIBDIR})
+   install(TARGETS CsGuiWin DESTINATION ${CMAKE_INSTALL_BINDIR}/platforms)
+
+   if (WIN32)
+     install(FILES $<TARGET_PDB_FILE:CsGuiWin> DESTINATION ${CMAKE_INSTALL_BINDIR}/platforms)
+   endif()
+
 endif()
 

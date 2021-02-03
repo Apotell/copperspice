@@ -60,15 +60,15 @@ target_sources(uic${TOOLS_SUFFIX}
 )
 
 if(CMAKE_SYSTEM_NAME MATCHES "DARWIN")
-   set(EXTRA_UIC_LDFLAGS  ${EXTRA_UIC_LDFLAGS} '-Wl,-rpath,$ORIGIN/../lib')
+   set(EXTRA_UIC_LDFLAGS  ${EXTRA_UIC_LDFLAGS} '-Wl,-rpath,$ORIGIN')
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-   set(EXTRA_UIC_LDFLAGS  ${EXTRA_UIC_LDFLAGS} '-Wl,-rpath,$ORIGIN/../lib')
+   set(EXTRA_UIC_LDFLAGS  ${EXTRA_UIC_LDFLAGS} '-Wl,-rpath,$ORIGIN')
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "(OpenBSD|FreeBSD|NetBSD)")
-   set(EXTRA_UIC_LDFLAGS  ${EXTRA_UIC_LDFLAGS} '-Wl,-rpath,$ORIGIN/../lib')
+   set(EXTRA_UIC_LDFLAGS  ${EXTRA_UIC_LDFLAGS} '-Wl,-rpath,$ORIGIN')
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
@@ -92,3 +92,7 @@ install(
    EXPORT CopperSpiceBinaryTargets ${INSTALL_TARGETS_DEFAULT_ARGS}
    DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+if (WIN32)
+  install(FILES $<TARGET_PDB_FILE:uic${TOOLS_SUFFIX}> DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
