@@ -14,9 +14,12 @@ project(copperspice)
 
 set(BUILD_MAJOR "1")
 set(BUILD_MINOR "7")
-set(BUILD_MICRO "0")
+set(BUILD_MICRO "1")
 
 set(BUILD_ABI "")
+
+# catch2 set up
+option(BUILD_TESTS "Enables building the Catch2 Unit Tests" OFF)
 
 include(CheckCXXCompilerFlag)
 include(CheckCXXSourceCompiles)
@@ -575,6 +578,12 @@ if (WITH_GUI)
    add_subdirectory(src/plugins/printerdrivers)
 endif()
 
+# catch2 set up
+if (BUILD_TESTS)
+   enable_testing()
+   add_subdirectory(test/core)
+endif()
+
 configure_file(
    ${CMAKE_SOURCE_DIR}/cmake/CopperSpiceConfig.cmake
    ${CMAKE_BINARY_DIR}/CopperSpiceConfig.cmake
@@ -616,7 +625,8 @@ install(
    DESTINATION ${PKG_PREFIX}
 )
 
-install(EXPORT CopperSpiceLibraryTargets
+install(
+   EXPORT CopperSpiceLibraryTargets
    NAMESPACE CopperSpice::
    FILE CopperSpiceLibraryTargets.cmake
    DESTINATION ${PKG_PREFIX}

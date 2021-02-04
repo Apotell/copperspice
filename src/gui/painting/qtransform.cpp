@@ -448,7 +448,8 @@ QTransform &QTransform::rotate(qreal a, Qt::Axis axis)
    if (a == 0) {
       return *this;
    }
-#ifndef QT_NO_DEBUG
+
+#if defined(CS_DEBUG)
    if (qIsNaN(a)) {
       qWarning() << "QTransform::rotate with NaN called";
       return *this;
@@ -457,12 +458,16 @@ QTransform &QTransform::rotate(qreal a, Qt::Axis axis)
 
    qreal sina = 0;
    qreal cosa = 0;
+
    if (a == 90. || a == -270.) {
       sina = 1.;
+
    } else if (a == 270. || a == -90.) {
       sina = -1.;
+
    } else if (a == 180.) {
       cosa = -1.;
+
    } else {
       qreal b = deg2rad * a;        // convert to radians
       sina = qSin(b);               // fast and convenient
@@ -484,6 +489,7 @@ QTransform &QTransform::rotate(qreal a, Qt::Axis axis)
             qreal tm12 = sina * affine._m22;
             qreal tm21 = -sina * affine._m11;
             qreal tm22 = cosa * affine._m22;
+
             affine._m11 = tm11;
             affine._m12 = tm12;
             affine._m21 = tm21;
@@ -512,6 +518,7 @@ QTransform &QTransform::rotate(qreal a, Qt::Axis axis)
             break;
          }
       }
+
       if (m_dirty < TxRotate) {
          m_dirty = TxRotate;
       }
@@ -525,6 +532,7 @@ QTransform &QTransform::rotate(qreal a, Qt::Axis axis)
          result.affine._m22 = cosa;
          result.m_23 = -sina * inv_dist_to_plane;
       }
+
       result.m_type = TxProject;
       *this = result **this;
    }

@@ -1373,8 +1373,6 @@ QModelIndex QFileSystemModel::setRootPath(const QString &newPath)
 #if defined(Q_OS_WIN32)
    QString longNewPath = qt_GetLongPathName(newPath);
 
-#elif defined(Q_OS_WIN)
-   QString longNewPath = QDir::fromNativeSeparators(newPath);
 #else
    QString longNewPath = newPath;
 
@@ -1406,9 +1404,11 @@ QModelIndex QFileSystemModel::setRootPath(const QString &newPath)
 
    if (! rootPath().isEmpty() && rootPath() != QString(".")) {
       // remove the watcher for the old rootPath
+
 #ifndef QT_NO_FILESYSTEMWATCHER
       d->fileInfoGatherer.removePath(rootPath());
 #endif
+
       // "marks" the node as dirty, so the next fetchMore call ask the gatherer to install a watcher again
       // this does not re-fetch everything (?)
       d->node(rootPath())->populatedChildren = false;
