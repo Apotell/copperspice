@@ -745,20 +745,27 @@ void QGraphicsScenePrivate::addPopup(QGraphicsWidget *widget)
 void QGraphicsScenePrivate::removePopup(QGraphicsWidget *widget, bool itemIsDying)
 {
    Q_ASSERT(widget);
-   int index = popupWidgets.indexOf(widget);
-   Q_ASSERT(index != -1);
 
-   for (int i = popupWidgets.size() - 1; i >= index; --i) {
-      QGraphicsWidget *widget = popupWidgets.takeLast();
-      ungrabMouse(widget, itemIsDying);
+   while (! popupWidgets.isEmpty()) {
+
+      QGraphicsWidget *item = popupWidgets.takeLast();
+
+      ungrabMouse(item, itemIsDying);
+
       if (focusItem && popupWidgets.isEmpty()) {
          QFocusEvent event(QEvent::FocusIn, Qt::PopupFocusReason);
          sendEvent(focusItem, &event);
-      } else if (keyboardGrabberItems.contains(static_cast<QGraphicsItem *>(widget))) {
-         ungrabKeyboard(static_cast<QGraphicsItem *>(widget), itemIsDying);
+
+      } else if (keyboardGrabberItems.contains(static_cast<QGraphicsItem *>(item))) {
+         ungrabKeyboard(static_cast<QGraphicsItem *>(item), itemIsDying);
       }
-      if (!itemIsDying && widget->isVisible()) {
-         widget->QGraphicsItem::d_ptr->setVisibleHelper(false, /* explicit = */ false);
+
+      if (! itemIsDying && item->isVisible()) {
+         item->QGraphicsItem::d_ptr->setVisibleHelper(false, false);
+      }
+
+      if (item == widget) {
+         break;
       }
    }
 }
@@ -811,8 +818,9 @@ void QGraphicsScenePrivate::grabMouse(QGraphicsItem *item, bool implicit)
 */
 void QGraphicsScenePrivate::ungrabMouse(QGraphicsItem *item, bool itemIsDying)
 {
-   int index = mouseGrabberItems.indexOf(item);
-   if (index == -1) {
+   auto iter = std::find(mouseGrabberItems.cbegin(), mouseGrabberItems.cend(), item);
+
+   if (iter == mouseGrabberItems.cend()) {
       qWarning("QGraphicsItem::ungrabMouse: not a mouse grabber");
       return;
    }
@@ -820,12 +828,17 @@ void QGraphicsScenePrivate::ungrabMouse(QGraphicsItem *item, bool itemIsDying)
    if (item != mouseGrabberItems.last()) {
       // Recursively ungrab the next mouse grabber until we reach this item
       // to ensure state consistency.
-      ungrabMouse(mouseGrabberItems.at(index + 1), itemIsDying);
+
+      ++iter;
+      ungrabMouse(*iter, itemIsDying);
    }
+
    if (!popupWidgets.isEmpty() && item == popupWidgets.last()) {
+
       // If the item is a popup, go via removePopup to ensure state
       // consistency and that it gets hidden correctly - beware that
       // removePopup() reenters this function to continue removing the grab.
+
       removePopup(popupWidgets.constLast(), itemIsDying);
       return;
    }
@@ -2541,7 +2554,7 @@ void QGraphicsScene::update(const QRectF &rect)
    bool directUpdates = false;
 
    const QMetaMethod &metaMethod = this->metaObject()->method(metaObject()->indexOfSignal("changed(const QList<QRectF> &)"));
-   directUpdates = ! ( this->isSignalConnected(metaMethod) ) && ! d->views.isEmpty();
+      directUpdates = ! ( this->isSignalConnected(metaMethod) ) && ! d->views.isEmpty();
 
    if (rect.isNull()) {
       d->updateAll = true;
@@ -3480,24 +3493,20 @@ void QGraphicsScene::wheelEvent(QGraphicsSceneWheelEvent *wheelEvent)
 {
    Q_D(QGraphicsScene);
    QList<QGraphicsItem *> wheelCandidates = d->itemsAtPosition(wheelEvent->screenPos(),
-         wheelEvent->scenePos(),
-         wheelEvent->widget());
+               wheelEvent->scenePos(), wheelEvent->widget());
 
-   // Find the first popup under the mouse (including the popup's descendants) starting from the last.
-   // Remove all popups after the one found, or all or them if no popup is under the mouse.
-   // Then continue with the event.
+   if (! wheelCandidates.isEmpty()) {
+      QGraphicsItem *firstWheel = wheelCandidates.first();
 
-   QGraphicsWidget *lowestWidget = nullptr;
-   for (QList<QGraphicsWidget *>::const_reverse_iterator it = d->popupWidgets.crbegin(), end = d->popupWidgets.crend(); it != end && !wheelCandidates.isEmpty(); ++it) {
-      QGraphicsWidget *w = *it;
-      if (wheelCandidates.first() == w || w->isAncestorOf(wheelCandidates.first())) {
+      while (! d->popupWidgets.isEmpty()) {
+         QGraphicsWidget *item = d->popupWidgets.last();
+
+         if (firstWheel == item || item->isAncestorOf(firstWheel)) {
          break;
-      } else {
-         lowestWidget = w;
       }
-   }
-   if (lowestWidget != nullptr) {
-      d->removePopup(lowestWidget);
+
+         d->removePopup(item);
+      }
    }
 
    bool hasSetFocus = false;
