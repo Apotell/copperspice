@@ -16,10 +16,11 @@ set(BUILD_MAJOR "1")
 set(BUILD_MINOR "7")
 set(BUILD_MICRO "2")
 
-set(BUILD_ABI ${BUILD_MAJOR}.${BUILD_MINOR})
+set(BUILD_ABI "")
 
 # catch2 set up
 option(BUILD_TESTS "Enables building the Catch2 Unit Tests" OFF)
+set(BUILD_SHARED_LIBS OFF)
 
 include(CheckCXXCompilerFlag)
 include(CheckCXXSourceCompiles)
@@ -160,7 +161,7 @@ else()
 endif()
 
 string(TIMESTAMP BUILD_DATE "%Y-%m-%d")
-add_definitions(-DQT_SHARED)
+add_compile_definitions($<IF:$<BOOL:${BUILD_SHARED_LIBS}>,QT_SHARED,QT_STATIC>)
 
 check_include_file(dlfcn.h       HAVE_DLFCN_H)
 check_include_file(dirent.h      HAVE_DIRENT_H)

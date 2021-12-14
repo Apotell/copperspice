@@ -1,4 +1,4 @@
-add_library(CsCore SHARED "")
+add_library(CsCore)
 add_library(CopperSpice::CsCore ALIAS CsCore)
 
 set_target_properties(CsCore PROPERTIES OUTPUT_NAME CsCore${BUILD_ABI})

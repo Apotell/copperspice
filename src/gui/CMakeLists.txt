@@ -1,4 +1,4 @@
-add_library(CsGui SHARED "")
+add_library(CsGui)
 add_library(CopperSpice::CsGui ALIAS CsGui)
 
 set_target_properties(CsGui PROPERTIES OUTPUT_NAME CsGui${BUILD_ABI})

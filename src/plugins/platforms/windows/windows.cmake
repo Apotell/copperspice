@@ -43,7 +43,11 @@ list(APPEND PLATFORMS_WIN_OTHER_PRIVATE_INCLUDES
 
 if(BUILD_PLATFORMS_WINDOWS_PLUGIN)
 
-   add_library(CsGuiWin MODULE "")
+   if (BUILD_SHARED_LIBS)
+      add_library(CsGuiWin MODULE "")
+   else()
+      add_library(CsGuiWin STATIC "")
+   endif()
    add_library(CopperSpice::CsGuiWin ALIAS CsGuiWin)
 
    set_target_properties(CsGuiWin PROPERTIES OUTPUT_NAME CsGuiWin${BUILD_ABI} PREFIX "")

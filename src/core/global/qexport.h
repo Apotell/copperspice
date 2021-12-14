@@ -37,18 +37,15 @@
 #  define QT_SHARED
 #endif
 
-#ifdef QT_STATIC
-#  error "Currently unsupported"
-#endif
-
-
 #ifndef Q_DECL_EXPORT
-#  if defined(Q_IS_WIN)
-#    define Q_DECL_EXPORT    __declspec(dllexport)
-
-#  elif defined(QT_VISIBILITY_AVAILABLE)
-#    define Q_DECL_EXPORT    __attribute__((visibility("default")))
-#    define Q_DECL_HIDDEN    __attribute__((visibility("hidden")))
+#  if defined(QT_SHARED)
+#    if defined(Q_IS_WIN)
+#      define Q_DECL_EXPORT    __declspec(dllexport)
+     
+#    elif defined(QT_VISIBILITY_AVAILABLE)
+#      define Q_DECL_EXPORT    __attribute__((visibility("default")))
+#      define Q_DECL_HIDDEN    __attribute__((visibility("hidden")))
+#    endif
 #  endif
 
 #  ifndef Q_DECL_EXPORT
@@ -66,7 +63,7 @@
 #endif
 
 #ifndef Q_DECL_IMPORT
-#  if defined(Q_IS_WIN)
+#  if defined(Q_IS_WIN) && defined(QT_SHARED)
 #    define Q_DECL_IMPORT    __declspec(dllimport)
 #  else
 #    define Q_DECL_IMPORT

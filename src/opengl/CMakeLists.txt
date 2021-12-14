@@ -1,4 +1,4 @@
-add_library(CsOpenGL SHARED "")
+add_library(CsOpenGL)
 add_library(CopperSpice::CsOpenGL ALIAS CsOpenGL)
 
 set_target_properties(CsOpenGL PROPERTIES OUTPUT_NAME CsOpenGL${BUILD_ABI})

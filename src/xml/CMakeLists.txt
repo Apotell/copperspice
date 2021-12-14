@@ -1,4 +1,4 @@
-add_library(CsXml SHARED "")
+add_library(CsXml)
 add_library(CopperSpice::CsXml ALIAS CsXml)
 
 set_target_properties(CsXml PROPERTIES OUTPUT_NAME CsXml${BUILD_ABI})

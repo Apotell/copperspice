@@ -1,4 +1,4 @@
-add_library(CsNetwork SHARED "")
+add_library(CsNetwork)
 add_library(CopperSpice::CsNetwork ALIAS CsNetwork)
 
 set_target_properties(CsNetwork PROPERTIES OUTPUT_NAME CsNetwork${BUILD_ABI})
