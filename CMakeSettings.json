@@ -1,0 +1,32 @@
+{
+  "configurations": [
+    {
+      "name": "x64-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [
+        "msvc_x64_x64"
+      ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-DWITH_MULTIMEDIA=OFF -DWITH_SQL=OFF -DWITH_WEBKIT=OFF -DWITH_PSQL_PLUGIN=OFF -DWITH_MYSQL_PLUGIN=OFF -DWITH_XMLPATTERNS=OFF -DWITH_SCRIPT=OFF",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "cmakeExecutable": "D:/cmake/3.22.1/bin/cmake.exe"
+    },
+    {
+      "name": "x64-Release",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "inheritEnvironments": [
+        "msvc_x64_x64"
+      ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-DWITH_MULTIMEDIA=OFF -DWITH_SQL=OFF -DWITH_WEBKIT=OFF -DWITH_PSQL_PLUGIN=OFF -DWITH_MYSQL_PLUGIN=OFF -DWITH_XMLPATTERNS=OFF -DWITH_SCRIPT=OFF",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "cmakeExecutable": "D:/cmake/3.22.1/bin/cmake.exe"
+    }
+  ]
+}
