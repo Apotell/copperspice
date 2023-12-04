@@ -20,7 +20,7 @@ set(BUILD_MAJOR "1")
 set(BUILD_MINOR "8")
 set(BUILD_MICRO "2")
 
-set(BUILD_ABI ${BUILD_MAJOR}.${BUILD_MINOR})
+set(BUILD_ABI "")
 
 # enable catch2 unit tests in config
 option(BUILD_TESTS "Enables building the Catch2 Unit Tests" OFF)
@@ -54,11 +54,11 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "(Linux|OpenBSD|FreeBSD|NetBSD|DragonFly)")
    file(RELATIVE_PATH CS_BIN_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}"
                                    "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 
-   set(CMAKE_INSTALL_RPATH "$ORIGIN/${CS_BIN_RPATH}:$ORIGIN/..")
+   set(CMAKE_INSTALL_RPATH "$ORIGIN")
 
 elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
    set(CMAKE_INSTALL_BINDIR bin)
-   set(CMAKE_INSTALL_LIBDIR lib)
+   set(CMAKE_INSTALL_LIBDIR bin)
    set(CMAKE_INSTALL_INCLUDEDIR include)
 
 endif()
