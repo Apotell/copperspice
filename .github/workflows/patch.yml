@@ -49,11 +49,6 @@ jobs:
         echo "ARTIFACT_WINDOWS_CL_DEBUG=windows-cl_debug" >> $GITHUB_ENV
         echo "ARTIFACT_WINDOWS_CL_RELEASE=windows-cl_release" >> $GITHUB_ENV
 
-    - name: Download artifacts
-      uses: actions/download-artifact@v3
-      with:
-        path: out
-
     - name: Download CopperSpice Release
       uses: robinraju/release-downloader@v1.8
       with:
@@ -61,33 +56,31 @@ jobs:
         latest: true
         filename: '*.tar.gz'
         out-file-path: out
-        extract: true
+        extract: false
         token: ${{ secrets.GHA_DAVENCHE_CI_TOKEN }}
 
     - name: List directory contents
       run: |
         pushd out
-          ls -R
+          ls -l
+          artifacts = (
+            ${{ env.ARTIFACT_JAMMY_GCC_DEBUG }}
+            ${{ env.ARTIFACT_JAMMY_GCC_RELEASE }}
+            ${{ env.ARTIFACT_WINDOWS_CL_DEBUG }}
+            ${{ env.ARTIFACT_WINDOWS_CL_RELEASE }}
+          )
+          for artifact in "${artifacts[@]}"; do
+            tar xzfp $artifact.tar.gz
+            rm $artifact.tar.gz
+            ls -l
+            cp ../deploy/CMakeLists.txt ${{ env.MODULE_NAME }}/.
+            tar czfp $artifact.tar.gz ${{ env.MODULE_NAME }}
+            rm -rf $artifact
+          done
+          ls -l
         popd
 
-#          artifacts = (
-#            ${{ env.ARTIFACT_JAMMY_GCC_DEBUG }}
-#            ${{ env.ARTIFACT_JAMMY_GCC_RELEASE }}
-#            ${{ env.ARTIFACT_WINDOWS_CL_DEBUG }}
-#            ${{ env.ARTIFACT_WINDOWS_CL_RELEASE }}
-#          )
-#          for artifact in "${artifacts[@]}"; do
-#            pushd $artifact
-#              ls -l
-#              tar xzfp $artifact.tar.gz
-#              rm $artifact.tar.gz
-#              ls -l
-#              cp ../../deploy/CMakeLists.txt ${{ env.MODULE_NAME }}/.
-#              tar czfp $artifact.tar.gz ${{ env.MODULE_NAME }}
-#            popd
-#            mv $artifact/$artifact.tar.gz .
-#            rm -rf $artifact
-#          done
+
 
 #        ls -R
 
