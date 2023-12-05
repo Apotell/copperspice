@@ -1,0 +1,138 @@
+name: 'patch'
+
+concurrency:
+  group: ${{ github.repository }}-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+
+env:
+  MODULE_NAME: CopperSpice
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Setup environment
+      shell: bash
+      run: |
+        git config --global core.autocrlf input
+
+    - name: Git pull
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 0
+
+    - name: Get top commit details
+      uses: actions/github-script@0.3.0
+      id: author-date
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const commit_details = await github.git.getCommit({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            commit_sha: context.sha
+          });
+          return commit_details.data.author.date
+
+    - name: Setup environment
+      run: |
+        export COMMITTED_AT=$(date -d ${{ steps.author-date.outputs.result }} +'%Y.%m.%d_%H.%M.%S')
+        echo "COMMITTED_AT=$COMMITTED_AT" >> $GITHUB_ENV
+
+        echo "ARTIFACT_JAMMY_GCC_DEBUG=jammy-gcc_debug" >> $GITHUB_ENV
+        echo "ARTIFACT_JAMMY_GCC_RELEASE=jammy-gcc_release" >> $GITHUB_ENV
+        echo "ARTIFACT_WINDOWS_CL_DEBUG=windows-cl_debug" >> $GITHUB_ENV
+        echo "ARTIFACT_WINDOWS_CL_RELEASE=windows-cl_release" >> $GITHUB_ENV
+
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: out
+
+    - name: List directory contents
+      run: |
+        pushd out
+          ls -l
+          artifacts = (
+            ${{ env.ARTIFACT_JAMMY_GCC_DEBUG }}
+            ${{ env.ARTIFACT_JAMMY_GCC_RELEASE }}
+            ${{ env.ARTIFACT_WINDOWS_CL_DEBUG }}
+            ${{ env.ARTIFACT_WINDOWS_CL_RELEASE }}
+          )
+          for artifact in "${artifacts[@]}"; do
+            pushd $artifact
+              ls -l
+              tar xzfp $artifact.tar.gz
+              rm $artifact.tar.gz
+              ls -l
+              cp ../../deploy/CMakeLists.txt ${{ env.MODULE_NAME }}/.
+              tar czfp $artifact.tar.gz ${{ env.MODULE_NAME }}
+            popd
+            mv $artifact/$artifact.tar.gz .
+            rm -rf $artifact
+          done
+        popd
+        ls -R
+
+#    - name: Create Release
+#      id: create_release
+#      uses: actions/create-release@v1
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      with:
+#        tag_name: ${{ env.COMMITTED_AT }}
+#        release_name: ${{ env.MODULE_NAME }}
+#        draft: false
+#        prerelease: false
+#
+#    - name: Upload Release Asset (jammy-gcc_debug)
+#      uses: actions/upload-release-asset@v1.0.1
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      with:
+#        upload_url: ${{ steps.create_release.outputs.upload_url }}
+#        asset_path: out/${{ env.ARTIFACT_JAMMY_GCC_DEBUG }}/${{ env.ARTIFACT_JAMMY_GCC_DEBUG }}.tar.gz
+#        asset_name: ${{ env.ARTIFACT_JAMMY_GCC_DEBUG }}.tar.gz
+#        asset_content_type: application/zip
+#
+#    - name: Upload Release Asset (jammy-gcc_release)
+#      uses: actions/upload-release-asset@v1.0.1
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      with:
+#        upload_url: ${{ steps.create_release.outputs.upload_url }}
+#        asset_path: out/${{ env.ARTIFACT_JAMMY_GCC_RELEASE }}/${{ env.ARTIFACT_JAMMY_GCC_RELEASE }}.tar.gz
+#        asset_name: ${{ env.ARTIFACT_JAMMY_GCC_RELEASE }}.tar.gz
+#        asset_content_type: application/zip
+#
+#    - name: Upload Release Asset (windows-cl_debug)
+#      uses: actions/upload-release-asset@v1.0.1
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      with:
+#        upload_url: ${{ steps.create_release.outputs.upload_url }}
+#        asset_path: out/${{ env.ARTIFACT_WINDOWS_CL_DEBUG }}/${{ env.ARTIFACT_WINDOWS_CL_DEBUG }}.tar.gz
+#        asset_name: ${{ env.ARTIFACT_WINDOWS_CL_DEBUG }}.tar.gz
+#        asset_content_type: application/zip
+#
+#    - name: Upload Release Asset (windows-cl_release)
+#      uses: actions/upload-release-asset@v1.0.1
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      with:
+#        upload_url: ${{ steps.create_release.outputs.upload_url }}
+#        asset_path: out/${{ env.ARTIFACT_WINDOWS_CL_RELEASE }}/${{ env.ARTIFACT_WINDOWS_CL_RELEASE }}.tar.gz
+#        asset_name: ${{ env.ARTIFACT_WINDOWS_CL_RELEASE }}.tar.gz
+#        asset_content_type: application/zip
+#
+#    - name: Delete some old releases
+#      uses: dev-drprasad/delete-older-releases@v0.3.2
+#      with:
+#        keep_latest: 5
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
