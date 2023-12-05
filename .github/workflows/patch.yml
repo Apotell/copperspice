@@ -63,13 +63,14 @@ jobs:
       run: |
         pushd out
           ls -l
-          artifacts = (
-            ${{ env.ARTIFACT_JAMMY_GCC_DEBUG }}
-            ${{ env.ARTIFACT_JAMMY_GCC_RELEASE }}
-            ${{ env.ARTIFACT_WINDOWS_CL_DEBUG }}
-            ${{ env.ARTIFACT_WINDOWS_CL_RELEASE }}
+          artifacts=(
+            "${{ env.ARTIFACT_JAMMY_GCC_DEBUG }}"
+            "${{ env.ARTIFACT_JAMMY_GCC_RELEASE }}"
+            "${{ env.ARTIFACT_WINDOWS_CL_DEBUG }}"
+            "${{ env.ARTIFACT_WINDOWS_CL_RELEASE }}"
           )
-          for artifact in "${artifacts[@]}"; do
+          for artifact in $artifacts;
+          do
             tar xzfp $artifact.tar.gz
             rm $artifact.tar.gz
             ls -l
