@@ -69,14 +69,16 @@ jobs:
             "${{ env.ARTIFACT_WINDOWS_CL_DEBUG }}"
             "${{ env.ARTIFACT_WINDOWS_CL_RELEASE }}"
           )
-          for artifact in $artifacts;
+          for artifact in $artifacts
           do
+            echo $artifact
             tar xzfp $artifact.tar.gz
             rm $artifact.tar.gz
             ls -l
             cp ../deploy/CMakeLists.txt ${{ env.MODULE_NAME }}/.
             tar czfp $artifact.tar.gz ${{ env.MODULE_NAME }}
-            rm -rf $artifact
+            rm -rf ${{ env.MODULE_NAME }}
+            ls -l
           done
           ls -l
         popd
