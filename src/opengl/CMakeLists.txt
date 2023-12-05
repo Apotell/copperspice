@@ -162,3 +162,6 @@ install(
    COMPONENT Devel
 )
 
+if (WIN32)
+  install(FILES $<TARGET_PDB_FILE:CsOpenGL> DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()

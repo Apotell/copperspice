@@ -328,6 +328,10 @@ install(
 
 install(FILES ${CMAKE_BINARY_DIR}/include/cs-config.h  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} )
 
+if (WIN32)
+  install(FILES $<TARGET_PDB_FILE:CsCore> DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
+
 if (CsSignal_FOUND)
 
    if (CS_INSTALL_MODE STREQUAL "Deploy")
